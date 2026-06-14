@@ -48,7 +48,28 @@ Every response is scored 1–5 on seven dimensions:
 
 ## Example use case
 
-A support team is deciding which model powers an **answer-drafting assistant** that must stay grounded in help-center docs. We compare two anonymized models (Model A vs Model B) on the same grounded prompt, score both, and recommend one — with the trade-offs spelled out. Full walkthrough in [`docs/sample-comparison-review.md`](docs/sample-comparison-review.md).
+A support team is deciding which model powers an **answer-drafting assistant** that must stay grounded in help-center docs. We compare two anonymized models (Model A vs Model B) on the same grounded prompt, score both, and recommend one — with the trade-offs spelled out. Full walkthrough in [`docs/ai-pm/sample-comparison-review.md`](docs/ai-pm/sample-comparison-review.md).
+
+## Run locally
+
+This repository keeps the original LLM Comparator app and Python package structure. To run the web UI from source:
+
+```sh
+npm install
+npm run build
+npm run serve
+```
+
+`npm run build` creates the `dist/` app bundle, and `npm run serve` serves that built bundle with `web-dev-server` using the scripts defined in [`package.json`](package.json).
+
+For the Python helper package, install from the `python/` directory:
+
+```sh
+cd python
+pip install -e .
+```
+
+The Python package includes notebook-oriented examples and Vertex AI helper classes from the upstream project; using those paths requires your own Google Cloud/Vertex AI setup and credentials.
 
 ## Honest attribution
 

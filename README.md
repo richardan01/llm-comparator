@@ -24,11 +24,11 @@ These docs make that judgment explicit and repeatable instead of vibes-based.
 
 ## How to use it as an eval workflow
 
-1. **Frame the decision** → [`docs/ai-pm-eval-use-case.md`](docs/ai-pm-eval-use-case.md)
-2. **Score against a rubric** → [`docs/model-comparison-rubric.md`](docs/model-comparison-rubric.md)
-3. **Apply the framework** (weighting, aggregation, trade-offs) → [`docs/response-quality-framework.md`](docs/response-quality-framework.md)
-4. **Run a side-by-side review** → [`docs/sample-comparison-review.md`](docs/sample-comparison-review.md)
-5. **Turn it into a decision** → [`docs/product-decision-notes.md`](docs/product-decision-notes.md)
+1. **Frame the decision** → [`docs/ai-pm/ai-pm-eval-use-case.md`](docs/ai-pm/ai-pm-eval-use-case.md)
+2. **Score against a rubric** → [`docs/ai-pm/model-comparison-rubric.md`](docs/ai-pm/model-comparison-rubric.md)
+3. **Apply the framework** (weighting, aggregation, trade-offs) → [`docs/ai-pm/response-quality-framework.md`](docs/ai-pm/response-quality-framework.md)
+4. **Run a side-by-side review** → [`docs/ai-pm/sample-comparison-review.md`](docs/ai-pm/sample-comparison-review.md)
+5. **Turn it into a decision** → [`docs/ai-pm/product-decision-notes.md`](docs/ai-pm/product-decision-notes.md)
 
 The comparison tool itself renders responses side by side; these docs supply the evaluation logic a PM brings to that view.
 

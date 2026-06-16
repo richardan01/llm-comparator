@@ -1,18 +1,21 @@
 # Response Quality Framework
 
-> How the [rubric](model-comparison-rubric.md) becomes a repeatable process: weight dimensions by use case, aggregate fairly, and weigh the trade-offs that scores alone don't capture.
+> How the [rubric](model-comparison-rubric.md) becomes a repeatable process: weight dimensions by use case, aggregate fairly, and weigh the trade-offs that scores alone don't capture. Grounded in [Hamel & Shreya's Analyze–Measure–Improve lifecycle](eval-methodology.md).
 
 ## The process
 
 ```
+0. Error analysis            → review 50–100 traces; build failure taxonomy  ← H&S foundation
 1. Fix the use case          → what is "good" here?
 2. Weight the 7 dimensions   → not all matter equally
-3. Score both responses      → 1–5 per dimension (rubric)
+3. Score both responses      → 1–5 per dimension (rubric, for exploration)
 4. Apply vetoes              → any dealbreaker kills the candidate
 5. Aggregate                 → weighted score, with rationale
 6. Add non-quality factors   → cost, latency, reliability
 7. Decide + record           → recommendation + trade-offs
 ```
+
+> **Step 0 is the most skipped and the most important.** Hamel & Shreya: "Error analysis is what makes measurement meaningful." Running the rubric without it means you're measuring the wrong things. See [`eval-methodology.md`](eval-methodology.md) for the full error analysis process.
 
 ## Step 1–2: Weight by use case
 
@@ -82,6 +85,25 @@ This framework is deliberately different from running a benchmark. Both have a p
 | **Use it to** | Shortlist candidates | Decide what ships |
 
 Treat benchmarks as the **filter**; treat this framework as the **fit test**. See [`ai-pm-eval-use-case.md`](ai-pm-eval-use-case.md) for the longer contrast.
+
+## When to automate
+
+H&S are explicit: automate sparingly, in cost order:
+
+```
+1. Simple assertions / regex / schema checks  ← start here
+2. Reference-based checks (compare to known-good answer)
+3. LLM-as-a-judge                             ← only for subjective, persistent failures
+```
+
+Don't build an LLM judge until error analysis confirms the failure is real, frequent, and can't be caught by a rule. For the CI/CD vs. production distinction:
+
+| Context | Approach |
+|---|---|
+| **CI/CD** | Small curated set (~100 examples). Fast binary assertions. Gates deployment. |
+| **Production** | Sample live traffic. LLM judges acceptable (no ground truth). Track confidence intervals. |
+
+When production monitoring finds a new failure pattern, add it to the CI/CD set to prevent regression.
 
 ## Why repeatable matters
 

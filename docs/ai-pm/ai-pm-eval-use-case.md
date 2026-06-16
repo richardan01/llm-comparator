@@ -43,6 +43,9 @@ Engineers can report benchmark scores. The PM owns the questions benchmarks don'
 - **What "good" means for *this* workflow** — for grounded support drafts, *grounding* and *safety* outrank cleverness.
 - **Which failures are unacceptable vs annoying** — a hallucinated refund policy is a blocker; a slightly stiff tone is not.
 - **The trade-off the business will accept** — is a 15% quality gain worth 2× cost and 400ms more latency?
+- **Running error analysis before any scoring** — reviewing real traces to discover what actually fails, before deciding what to measure. This is the step most teams skip; [Hamel & Shreya](https://hamel.dev/notes/llm/evals/) call it the most important activity in evals.
+
+**The Benevolent Dictator pattern** (H&S): appoint one domain expert as the quality decision-maker — not a labeling committee. Consensus annotation introduces inconsistency; a single trusted voice who understands your users drives faster, clearer evaluation. In most product teams, this is the PM or a senior domain specialist. See [`eval-methodology.md`](eval-methodology.md) for how this fits the full lifecycle.
 
 ## Where comparison fits in the product loop
 

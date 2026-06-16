@@ -28,13 +28,16 @@ Benchmarks rank general capability. **Product quality is contextual:** grounding
 
 ## How to use it as an eval workflow
 
+The eval layer is grounded in [Hamel Husain & Shreya Shankar's](https://hamel.dev/notes/llm/evals/) Analyze–Measure–Improve lifecycle. Error analysis comes first.
+
+0. **Understand the eval lifecycle** (H&S methodology) → [`docs/ai-pm/eval-methodology.md`](docs/ai-pm/eval-methodology.md)
 1. **Frame the decision** → [`docs/ai-pm/ai-pm-eval-use-case.md`](docs/ai-pm/ai-pm-eval-use-case.md)
-2. **Score against a rubric** → [`docs/ai-pm/model-comparison-rubric.md`](docs/ai-pm/model-comparison-rubric.md)
+2. **Score against a rubric** (calibration tool, not production eval) → [`docs/ai-pm/model-comparison-rubric.md`](docs/ai-pm/model-comparison-rubric.md)
 3. **Apply the framework** (weighting, aggregation, trade-offs) → [`docs/ai-pm/response-quality-framework.md`](docs/ai-pm/response-quality-framework.md)
 4. **Run a side-by-side review** → [`docs/ai-pm/sample-comparison-review.md`](docs/ai-pm/sample-comparison-review.md)
 5. **Turn it into a decision** → [`docs/ai-pm/product-decision-notes.md`](docs/ai-pm/product-decision-notes.md)
 
-The comparison tool itself renders responses side by side; these docs supply the evaluation logic a PM brings to that view.
+The comparison tool renders responses side by side; these docs supply the evaluation logic a PM brings to that view.
 
 ## Quality dimensions
 
@@ -79,7 +82,8 @@ The Python package includes notebook-oriented examples and Vertex AI helper clas
 
 - The comparison UI/tooling is **[PAIR-code/llm-comparator](https://github.com/PAIR-code/llm-comparator)** (Apache-2.0), not my work.
 - Original code, license, and authorship are retained.
-- My contribution is the **AI PM evaluation layer** in [`docs/`](docs/) — rubrics, frameworks, sample reviews, and decision notes.
+- My contribution is the **AI PM evaluation layer** in [`docs/ai-pm/`](docs/ai-pm/) — rubrics, frameworks, sample reviews, and decision notes.
+- The eval methodology is grounded in **[Hamel Husain & Shreya Shankar's](https://hamel.dev/notes/llm/evals/)** LLM eval framework (their ideas, not my invention; credited throughout).
 - Any model names mentioned are illustrative; this repo contains **no benchmark results I ran against real vendor models**.
 
 ## Status

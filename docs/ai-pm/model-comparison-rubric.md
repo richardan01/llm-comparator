@@ -108,3 +108,5 @@ After running error analysis on your real traces (see [`eval-methodology.md`](ev
 | Actionability | **Pass:** includes a concrete next step the agent can act on. **Fail:** ends without a clear action. |
 
 The binary criteria are *yours* — derived from your failure taxonomy, not from this rubric. This rubric is the starting point; the binary criteria are the destination.
+
+**For agents,** criteria extend beyond the final response to the *trajectory* — e.g. **Pass:** called `look_up_order` before deciding eligibility; **Fail:** decided from memory. See [`eval-methodology.md`](eval-methodology.md#agentic--multi-turn-eval) and the agentic variant in [`sample-comparison-review.md`](sample-comparison-review.md).

@@ -79,6 +79,44 @@ This is where the comparison workflow in this repo lives: **model comparison is 
 
 ---
 
+## Agentic & multi-turn eval
+
+Everything above assumes a single turn: one prompt, one response. **Agentic systems break that assumption** — they take multiple steps, call tools, and carry context across turns. An agent can produce a perfect-looking *final* answer while taking a broken, expensive, or unsafe *path* to get there. A single-turn rubric can't see the path.
+
+When the thing under eval is an agent, the "trace" you do error analysis on (Step 1) is the **full trajectory** — every turn, tool call, and intermediate state — not just the last message.
+
+### Two-phase eval (H&S)
+
+1. **End-to-end task success** — treat the agent as a black box: *did we meet the user's goal?* Define success precisely; this is the headline metric.
+2. **Step-level diagnostics** — once error analysis flags a failing workflow, open up the trajectory and check the components:
+   - **Tool choice** — did it call the right tool (or any tool, when it should have)?
+   - **Parameter extraction** — were the arguments correct and complete?
+   - **Error recovery** — did it handle a tool error / empty result, or barrel ahead?
+   - **Context retention** — did it preserve constraints across steps?
+   - **Efficiency** — step count, latency, token/cost to reach the goal.
+
+### Transition failure matrix (H&S)
+
+Rather than re-reading whole traces, tabulate **the last successful state vs. where the first failure occurred.** This turns trajectory complexity into a ranked list of bottleneck transitions. Toy example for the support agent:
+
+| Last good state → first failure | Count |
+|---|---|
+| `LookUpOrder → DecideEligibility` | 9 |
+| `DecideEligibility → IssueRefund` | 3 |
+| `Greet → LookUpOrder` | 1 |
+
+The data says: fix the eligibility decision after order lookup first — it's where most trajectories break.
+
+### Multi-turn principles (H&S)
+
+- **Log full session IDs** so a trace is reconstructable end-to-end.
+- **Annotate only the *first* failure in a trace** — downstream failures usually cascade from it, so counting them all inflates the wrong things.
+- **Reproduce a single-turn variant first** — before assuming a failure needs multi-turn context, check whether it reproduces in one turn. Often it does, and it's far cheaper to debug.
+
+> Error analysis still comes first (Step 1) — it just operates over trajectories. The Benevolent Dictator reviews traces, and tool/step failures become their own binary criteria (e.g. "Pass: called `look_up_order` before deciding eligibility").
+
+---
+
 ## When to automate
 
 H&S are explicit: **automate sparingly, and in the right order.**
@@ -112,8 +150,9 @@ New production failures feed back into CI/CD: when monitoring surfaces a new fai
 | This doc | Maps the methodology so you know what's missing (error analysis, failure taxonomy) |
 
 What this repo **doesn't provide** (and can't substitute for):
-- Your real production traces
+- Your real production traces (single-turn responses *or* agent trajectories)
 - Your domain-specific failure taxonomy
 - Binary criteria derived from your actual users' failure modes
+- Trajectory logging / transition-matrix tooling for agentic systems
 
 That work has to happen in your product context. This repo shows *how to think about* that process.

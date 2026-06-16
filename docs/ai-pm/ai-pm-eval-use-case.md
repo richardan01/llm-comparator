@@ -21,6 +21,8 @@ We're choosing the model behind the drafting step. Two candidates are on the tab
 
 So the evaluation isn't "which is smarter." It's **which produces drafts an agent can trust and ship, at a cost we can live with.**
 
+> **When the assistant becomes an agent.** The same use case turns agentic the moment the assistant can *act* — look up the order, check the window, issue a refund or escalate — instead of only drafting text. That adds a whole failure surface single-turn scoring can't see: the agent can reach the right answer via a wrong or unsafe path (skipped a lookup, wrong tool arg, ignored a tool error). Evaluating that means comparing **trajectories**, not just final answers — see [`eval-methodology.md`](eval-methodology.md#agentic--multi-turn-eval) and the agentic variant in [`sample-comparison-review.md`](sample-comparison-review.md).
+
 ## Why this is a product-quality problem, not only a technical benchmark
 
 Benchmarks (MMLU, HELM, leaderboard arenas) measure general capability on shared, generic tasks. They're useful for **shortlisting** candidate models — but they don't decide what ships.

@@ -57,3 +57,11 @@
 - The comparison surfaced a concrete, repeatable test: "does the draft refuse the out-of-window refund and stay on-policy?" — a prompt worth keeping in a regression set.
 
 → Decision and trade-offs in [`product-decision-notes.md`](product-decision-notes.md).
+
+---
+
+## If this were an agent
+
+This review scores a single drafted response. If the assistant were an **agent** — able to call a `look_up_order` tool, check the 14-day window itself, then `issue_refund()` or `escalate()` — the comparison would extend to the **whole trajectory**, not just the final message. Two agents can return the *same* final answer while one took a clean path and the other skipped a required tool call and was right only by luck. Comparing those means looking at tool choice, parameter correctness, error recovery, and where the first failed transition occurred.
+
+The methodology for that lives in [`eval-methodology.md`](eval-methodology.md#agentic--multi-turn-eval) (two-phase eval, transition failure matrix, multi-turn principles) and [`response-quality-framework.md`](response-quality-framework.md#comparing-agents-not-just-answers) (agentic binary criteria). A full worked agentic comparison is out of scope for this single-turn sample.

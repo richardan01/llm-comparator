@@ -22,6 +22,10 @@ Choosing a model — or accepting a response — isn't only a technical benchmar
 
 These docs make that judgment explicit and repeatable instead of vibes-based.
 
+## Product quality, not just a benchmark
+
+Benchmarks rank general capability. **Product quality is contextual:** grounding matters more for a support assistant than for a brainstorming tool; safety and tone weight differently per audience; latency and cost can outweigh a small accuracy lift. A leaderboard can't answer "is this model right *for this workflow?*" — that's the question structured comparison is built to answer, and the one an AI PM owns.
+
 ## How to use it as an eval workflow
 
 1. **Frame the decision** → [`docs/ai-pm/ai-pm-eval-use-case.md`](docs/ai-pm/ai-pm-eval-use-case.md)

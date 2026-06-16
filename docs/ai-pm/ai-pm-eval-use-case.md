@@ -21,6 +21,21 @@ We're choosing the model behind the drafting step. Two candidates are on the tab
 
 So the evaluation isn't "which is smarter." It's **which produces drafts an agent can trust and ship, at a cost we can live with.**
 
+## Why this is a product-quality problem, not only a technical benchmark
+
+Benchmarks (MMLU, HELM, leaderboard arenas) measure general capability on shared, generic tasks. They're useful for **shortlisting** candidate models — but they don't decide what ships.
+
+| Benchmark thinking | Product-quality thinking |
+|---|---|
+| "Which model scores higher overall?" | "Which response is right for *this* workflow?" |
+| One ranked number per model | Per-dimension scores, weighted by use case |
+| Generic prompts | Real prompts from real user paths |
+| Average performance | Worst-case behavior (vetoes on grounding/safety) |
+| Capability only | Capability ↔ cost ↔ latency ↔ tone ↔ safety |
+| Model-level | Response-level *and* model-level |
+
+A model can win a benchmark and still be the wrong call here — e.g. it's eager, fluent, and ungrounded (exactly the failure in the [sample review](sample-comparison-review.md)). Product quality is **contextual, multi-dimensional, and trade-off bound**, which is why a PM — not a leaderboard — owns it.
+
 ## Why a PM owns this (not just ML)
 
 Engineers can report benchmark scores. The PM owns the questions benchmarks don't answer:

@@ -69,6 +69,20 @@ Most real model decisions come down to balancing these tensions:
 
 A PM's job is to name *which* trade-off this product is making, and why it's acceptable.
 
+## Benchmark vs evaluation
+
+This framework is deliberately different from running a benchmark. Both have a place — they answer different questions.
+
+| | Public benchmark | This framework |
+|---|---|---|
+| **Question** | "How capable is the model?" | "Is this response right for our workflow?" |
+| **Prompts** | Generic, shared, often academic | The product's real prompts + context |
+| **Unit** | Model | Response (and model, by aggregation) |
+| **Output** | One score / rank | Per-dimension scores + trade-offs + decision |
+| **Use it to** | Shortlist candidates | Decide what ships |
+
+Treat benchmarks as the **filter**; treat this framework as the **fit test**. See [`ai-pm-eval-use-case.md`](ai-pm-eval-use-case.md) for the longer contrast.
+
 ## Why repeatable matters
 
 When a new model ships, you don't re-litigate "what is good." You **re-run the same prompts, re-score, re-aggregate.** The framework turns model selection from a one-off debate into a standing evaluation you can trust over time.

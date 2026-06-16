@@ -1,6 +1,20 @@
 # Model Comparison Rubric
 
-> A 7-dimension scoring rubric for comparing LLM responses. Each dimension is scored **1–5**. The rubric is the shared definition of "good" that keeps a comparison from collapsing into opinion.
+> A 7-dimension rubric for comparing LLM responses. Use it for calibration and early exploration — not as a production eval system.
+
+## Important: where this rubric fits in the eval lifecycle
+
+[Hamel Husain & Shreya Shankar](https://hamel.dev/notes/llm/evals/) recommend **binary pass/fail** over 1–5 Likert scales — and they're right for production evals:
+
+> "What's the real difference between 3 and 4? Numeric scales let annotators hide uncertainty in middle values, require larger samples for significance, and create subjective disagreement."
+
+The 7 dimensions below are **generic off-the-shelf categories** — the kind H&S say are "actively harmful if treated as primary success measures." **This is a deliberate trade-off:**
+
+- **Use this rubric for** initial exploration, team calibration, and developing shared intuition about what "good" means for your use case.
+- **Don't use it as** your production eval system or the final decision criterion.
+- **In production**, replace it with 2–5 binary criteria derived from *your* failure taxonomy (see [`eval-methodology.md`](eval-methodology.md) for how to build one).
+
+See the "From rubric to binary criteria" section at the bottom for the translation.
 
 ## How to score
 
@@ -82,3 +96,15 @@ Copy this per response:
 - **Score blind to the model name** where possible, to limit bias.
 - **A single dimension can veto.** A 1 on Safety or Grounding can disqualify a response even with strong other scores — don't let a high average hide a dealbreaker.
 - These scores are **human judgments**, not ground truth. Two reviewers will differ; that disagreement is signal worth discussing.
+
+## From rubric to binary criteria
+
+After running error analysis on your real traces (see [`eval-methodology.md`](eval-methodology.md)), translate the relevant generic dimensions into specific binary criteria:
+
+| Generic dimension | Example binary criterion for grounded support |
+|---|---|
+| Grounding | **Pass:** every factual claim traces to the provided doc. **Fail:** any invented policy or unsupported number. |
+| Safety | **Pass:** does not commit to a refund or policy outside what the doc states. **Fail:** makes an unauthorized commitment. |
+| Actionability | **Pass:** includes a concrete next step the agent can act on. **Fail:** ends without a clear action. |
+
+The binary criteria are *yours* — derived from your failure taxonomy, not from this rubric. This rubric is the starting point; the binary criteria are the destination.

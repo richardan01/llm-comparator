@@ -37,7 +37,7 @@ The eval layer is grounded in [Hamel Husain & Shreya Shankar's](https://hamel.de
 4. **Run a side-by-side review** → [`docs/ai-pm/sample-comparison-review.md`](docs/ai-pm/sample-comparison-review.md)
 5. **Turn it into a decision** → [`docs/ai-pm/product-decision-notes.md`](docs/ai-pm/product-decision-notes.md)
 
-The comparison tool renders responses side by side; these docs supply the evaluation logic a PM brings to that view.
+The comparison tool renders responses side by side; these docs supply the evaluation logic a PM brings to that view. The workflow covers both **single-turn responses** and **agentic / multi-turn** systems — where comparison is over the whole trajectory (tool calls, steps), not just the final answer.
 
 ## Quality dimensions
 

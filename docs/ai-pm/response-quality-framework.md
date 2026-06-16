@@ -72,6 +72,23 @@ Most real model decisions come down to balancing these tensions:
 
 A PM's job is to name *which* trade-off this product is making, and why it's acceptable.
 
+## Comparing agents, not just answers
+
+When the unit under eval is an **agent** (multiple steps, tool calls, multi-turn) rather than a single response, comparison happens over the **whole trajectory**, not just the final answer. Two agents can return the same correct answer while one took a clean path and the other guessed, skipped a required tool, or made an unsafe call along the way — see the agentic variant in [`sample-comparison-review.md`](sample-comparison-review.md).
+
+Add agentic criteria to the comparison (binary, derived from error analysis — see [`eval-methodology.md`](eval-methodology.md)):
+
+| Agentic criterion | Pass / Fail example |
+|---|---|
+| **Task success** | Pass: user's goal met end-to-end. |
+| **Tool choice** | Pass: called `look_up_order` before deciding eligibility. Fail: guessed from memory. |
+| **Parameter correctness** | Pass: passed the right order ID. Fail: hallucinated or wrong field. |
+| **Error recovery** | Pass: handled an empty/failed tool result. Fail: barreled ahead on bad data. |
+| **Policy across steps** | Pass: stayed in-policy at every step. Fail: committed an out-of-window refund mid-trajectory. |
+| **Efficiency** | Fewer steps / lower cost to reach the same goal is a real tie-breaker. |
+
+> Final-answer parity is not trajectory parity. For agents, the path *is* part of the product — a fragile or unsafe path will eventually surface as a user-facing failure.
+
 ## Benchmark vs evaluation
 
 This framework is deliberately different from running a benchmark. Both have a place — they answer different questions.

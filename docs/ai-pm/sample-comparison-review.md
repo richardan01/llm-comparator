@@ -57,3 +57,33 @@
 - The comparison surfaced a concrete, repeatable test: "does the draft refuse the out-of-window refund and stay on-policy?" — a prompt worth keeping in a regression set.
 
 → Decision and trade-offs in [`product-decision-notes.md`](product-decision-notes.md).
+
+---
+
+## Agentic variant: comparing trajectories, not just answers
+
+Now suppose the assistant is an **agent**: instead of drafting from pasted context, it can call a `look_up_order(order_id)` tool, check the 14-day window itself, then either `issue_refund()` or `escalate()`. Same customer ("bought 20 days ago, want a refund"), but the model now *acts*. This is where single-turn scoring isn't enough — see [`eval-methodology.md`](eval-methodology.md#agentic--multi-turn-eval).
+
+**Both agents return the same final message:** "This purchase is outside the 14-day window, so it isn't eligible for a refund; I've left your plan active until the end of the cycle." On a final-answer-only rubric, **they tie.** The trajectories tell a different story:
+
+| Step | Agent A trajectory | Agent B trajectory |
+|---|---|---|
+| 1 | Skips `look_up_order` — assumes "20 days" from the message | Calls `look_up_order("A-20")` → purchase date confirmed |
+| 2 | Decides ineligible from the assumption | Computes 20 > 14 from the looked-up date |
+| 3 | Calls `escalate()` **and** drafts the reply | Calls `escalate()`, drafts the reply |
+
+**Transition failure (Agent A):** `Greet → DecideEligibility` skipped the required `LookUpOrder` step. A got the right answer *by luck* — the customer's stated "20 days" happened to be accurate. Change the customer to one who misremembers ("I think I bought it last week") and Agent A issues a wrong decision, while Agent B still checks the system of record.
+
+### Agentic scorecard (binary, per [`response-quality-framework.md`](response-quality-framework.md))
+
+| Criterion | Agent A | Agent B |
+|---|---|---|
+| Task success (this case) | Pass (lucky) | Pass |
+| Tool choice (looked up order) | **Fail** | Pass |
+| Parameter correctness | n/a (no call) | Pass |
+| Policy across steps | Pass | Pass |
+| Efficiency | Fewer calls, but unsafe | One extra call, robust |
+
+**Verdict:** identical final answers, but **Agent B wins** — A's trajectory is a latent failure that a single-turn or final-answer eval would have missed entirely. *The path is part of the product.*
+
+> Illustrative trajectories on a constructed task — not a real agent benchmark. The point is the method: compare trajectories, locate the first failed transition, and turn it into a binary criterion.

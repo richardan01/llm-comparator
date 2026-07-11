@@ -15,12 +15,12 @@
 """Classes for calling generating LLMs and embedding models."""
 
 import abc
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 import time
 from typing import Optional
 
-from vertexai import generative_models
-from vertexai import language_models
+from google import genai
+from google.genai import types as genai_types
 import tqdm.auto
 
 from llm_comparator import _logging
@@ -28,8 +28,6 @@ from llm_comparator import _logging
 
 MAX_NUM_RETRIES = 5
 DEFAULT_MAX_OUTPUT_TOKENS = 256
-
-BATCH_EMBED_SIZE = 100
 
 _logger = _logging.logger
 
@@ -45,10 +43,34 @@ class GenerationModelHelper(abc.ABC):
 
 
 class VertexGenerationModelHelper(GenerationModelHelper):
-  """Vertex AI text generation model API calls."""
+  """Vertex AI text generation model calls via the Google Gen AI SDK."""
 
-  def __init__(self, model_name='gemini-pro'):
-    self.engine = generative_models.GenerativeModel(model_name)
+  def __init__(
+      self,
+      model_name: str = 'gemini-2.5-flash',
+      project: Optional[str] = None,
+      location: Optional[str] = None,
+      thinking_budget: Optional[int] = 0,
+  ):
+    """Initializes the generation model helper.
+
+    Args:
+      model_name: Name of a Gemini model available on Vertex AI.
+      project: Google Cloud project ID. Falls back to the
+        GOOGLE_CLOUD_PROJECT environment variable.
+      location: Google Cloud region, e.g. 'us-central1'. Falls back to the
+        GOOGLE_CLOUD_LOCATION environment variable.
+      thinking_budget: Thinking token budget for reasoning models. Defaults
+        to 0 (thinking disabled) so that short judge/bulletize/cluster
+        responses are not consumed by thinking tokens. Set to None to use the
+        model's default dynamic thinking; models that cannot disable thinking
+        (e.g. gemini-2.5-pro) require None or a positive budget.
+    """
+    self.model_name = model_name
+    self.thinking_budget = thinking_budget
+    self.client = genai.Client(
+        vertexai=True, project=project, location=location
+    )
 
   def predict(
       self,
@@ -60,31 +82,37 @@ class VertexGenerationModelHelper(GenerationModelHelper):
       return ''
     num_attempts = 0
     response = None
-    prediction = None
+
+    thinking_config = None
+    if self.thinking_budget is not None:
+      thinking_config = genai_types.ThinkingConfig(
+          thinking_budget=self.thinking_budget
+      )
 
     while num_attempts < MAX_NUM_RETRIES and response is None:
       num_attempts += 1
 
       try:
-        prediction = self.engine.generate_content(
-            prompt,
-            generation_config=generative_models.GenerationConfig(
+        response = self.client.models.generate_content(
+            model=self.model_name,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
                 temperature=temperature,
                 candidate_count=1,
                 max_output_tokens=max_output_tokens,
+                thinking_config=thinking_config,
             ),
         )
       except Exception as e:  # pylint: disable=broad-except
-        if 'quota' in str(e):
+        if 'quota' in str(e).lower():
           _logger.info('\033[31mQuota limit exceeded.\033[0m')
         wait_time = 2**num_attempts
         _logger.info('\033[31mWaiting %ds to retry...\033[0m', wait_time)
-        time.sleep(2**num_attempts)
+        time.sleep(wait_time)
 
-    if isinstance(prediction, Iterable):
-      prediction = list(prediction)[0]
-
-    return prediction.text if prediction is not None else ''
+    if response is None or response.text is None:
+      return ''
+    return response.text
 
   def predict_batch(
       self,
@@ -110,49 +138,63 @@ class EmbeddingModelHelper(abc.ABC):
 
 
 class VertexEmbeddingModelHelper(EmbeddingModelHelper):
-  """Vertex AI text embedding model API calls."""
+  """Vertex AI text embedding model calls via the Google Gen AI SDK."""
 
-  def __init__(self, model_name: str = 'textembedding-gecko@003'):
-    self.model = language_models.TextEmbeddingModel.from_pretrained(model_name)
+  def __init__(
+      self,
+      model_name: str = 'gemini-embedding-001',
+      project: Optional[str] = None,
+      location: Optional[str] = None,
+      output_dimensionality: Optional[int] = None,
+  ):
+    """Initializes the embedding model helper.
 
-  def _embed_single_run(
-      self, texts: Sequence[str]
-  ) -> Sequence[Sequence[float]]:
-    """Embeds a list of strings into the models embedding space."""
+    Args:
+      model_name: Name of a text embedding model available on Vertex AI.
+      project: Google Cloud project ID. Falls back to the
+        GOOGLE_CLOUD_PROJECT environment variable.
+      location: Google Cloud region, e.g. 'us-central1'. Falls back to the
+        GOOGLE_CLOUD_LOCATION environment variable.
+      output_dimensionality: Optional embedding size override, e.g. 768.
+        Defaults to the model's native size (3072 for gemini-embedding-001).
+    """
+    self.model_name = model_name
+    self.output_dimensionality = output_dimensionality
+    self.client = genai.Client(
+        vertexai=True, project=project, location=location
+    )
+
+  def embed(self, text: str) -> Sequence[float]:
+    """Embeds a string into the model's embedding space."""
+    # On Vertex AI, gemini-embedding-001 accepts only one input per request,
+    # so embedding requests are issued per-text rather than in batches.
     num_attempts = 0
     embeddings = None
 
-    if not isinstance(texts, list):
-      texts = list(texts)
+    config = None
+    if self.output_dimensionality is not None:
+      config = genai_types.EmbedContentConfig(
+          output_dimensionality=self.output_dimensionality
+      )
 
     while num_attempts < MAX_NUM_RETRIES and embeddings is None:
+      num_attempts += 1
       try:
-        embeddings = self.model.get_embeddings(texts)
+        response = self.client.models.embed_content(
+            model=self.model_name,
+            contents=text,
+            config=config,
+        )
+        embeddings = response.embeddings
       except Exception as e:  # pylint: disable=broad-except
         wait_time = 2**num_attempts
         _logger.info('Waiting %ds to retry... (%s)', wait_time, e)
         time.sleep(wait_time)
 
-    if embeddings is None:
+    if not embeddings:
       return []
 
-    return [embedding.values for embedding in embeddings]
-
-  def embed(self, text: str) -> Sequence[float]:
-    results = self._embed_single_run([text])
-    return results[0]
+    return embeddings[0].values
 
   def embed_batch(self, texts: Sequence[str]) -> Sequence[Sequence[float]]:
-    if len(texts) <= BATCH_EMBED_SIZE:
-      return self._embed_single_run(texts)
-    else:
-      results = []
-      for batch_start_index in tqdm.auto.tqdm(
-          range(0, len(texts), BATCH_EMBED_SIZE)
-      ):
-        results.extend(
-            self._embed_single_run(
-                texts[batch_start_index : batch_start_index + BATCH_EMBED_SIZE]
-            )
-        )
-      return results
+    return [self.embed(text) for text in tqdm.auto.tqdm(texts)]

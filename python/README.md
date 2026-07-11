@@ -44,16 +44,20 @@ interface with LLMs. Broadly, we support two kinds of models: generation models,
 which should be text-to-text language models, and embedding models.
 
 We provide concrete two concrete implementations of wrappers that interact with
-the [Google Vertex AI API][vertex-api]:
+the [Google Vertex AI API][vertex-api] via the [Google Gen AI SDK][genai-sdk]:
 
 *   `VertexGenerationModelHelper` supports any
     [generative language model][model-garden-gen] available in the Model Garden.
-    By default we use `gemini-pro`, but alternatives can be configured with the
-    `model_name=` constructor parameter.
+    By default we use `gemini-2.5-flash`, but alternatives can be configured
+    with the `model_name=` constructor parameter.
 *   `VertexEmbeddingModelHelper` supports any
     [text embedding model][model-garden-emb] available in the Model Garden.
-    By default we use `textembedding-gecko@003`, but alternatives can be
+    By default we use `gemini-embedding-001`, but alternatives can be
     configured with the `model_name=` constructor parameter.
+
+Both wrappers accept optional `project=` and `location=` constructor
+parameters, which fall back to the `GOOGLE_CLOUD_PROJECT` and
+`GOOGLE_CLOUD_LOCATION` environment variables.
 
 Additional wrapper classes can be implemented by subclassing
 `GenerationModelHelper` and `EmbeddingModelHelper` as necessary. We welcome
@@ -171,5 +175,6 @@ comparison.write(comparison_result, file_path)
 [llm-comparator-prs]: https://github.com/PAIR-code/llm-comparator/pulls
 [model-garden-emb]: https://console.cloud.google.com/vertex-ai/model-garden?pageState=(%22galleryStateKey%22:(%22f%22:(%22g%22:%5B%22supportedTasks%22,%22inputTypes%22%5D,%22o%22:%5B%22EMBEDDING%22,%22LANGUAGE%22%5D),%22s%22:%22%22))
 [model-garden-gen]: https://console.cloud.google.com/vertex-ai/model-garden?pageState=(%22galleryStateKey%22:(%22f%22:(%22g%22:%5B%22supportedTasks%22,%22inputTypes%22%5D,%22o%22:%5B%22GENERATION%22,%22LANGUAGE%22%5D),%22s%22:%22%22))
+[genai-sdk]: https://cloud.google.com/vertex-ai/generative-ai/docs/sdks/overview
 [vertex-api]: https://cloud.google.com/vertex-ai/docs/reference
 [vertex-auth]: https://cloud.google.com/vertex-ai/docs/authentication
